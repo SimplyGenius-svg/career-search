@@ -773,7 +773,7 @@ const HomePage: React.FC = () => {
            </button>
          </div>
          <div>
-           Made with ❤️ by Gyan
+           Made with ❤️ by gyanb
          </div>
        </motion.footer>
       </motion.div>{/* Closing tag for Main Content Area */}
