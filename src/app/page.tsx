@@ -248,7 +248,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center p-6 md:p-12 bg-gray-200 dark:bg-[#0f172a] text-gray-800 dark:text-white font-sans overflow-hidden">
+    <div className="relative flex min-h-screen flex-col items-center justify-center p-6 md:p-12 bg-gray-200 text-gray-800 font-sans overflow-hidden">
       {/* Animated Background Elements - Replaced by ParticleBackground */}
       {/*
       <motion.div
@@ -346,7 +346,7 @@ const HomePage: React.FC = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 onClick={() => setQuery('')}
-                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
                 aria-label="Clear search"
               >
                 <X size={16} />
@@ -382,7 +382,7 @@ const HomePage: React.FC = () => {
             >
               <div className="flex flex-col items-center gap-4">
                 <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-gray-600 dark:text-gray-400">Searching...</p>
+                <p className="text-gray-600">Searching...</p>
               </div>
             </motion.div>
           )}
@@ -395,10 +395,10 @@ const HomePage: React.FC = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[50px]"
+              className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden min-h-[50px]"
             >
-              <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 px-2">Popular searches</div>
+              <div className="p-2 border-b border-gray-100">
+                <div className="text-sm font-medium text-gray-500 px-2">Popular searches</div>
               </div>
               <div className="max-h-60 overflow-y-auto">
                 {Object.entries(analytics.popularQueries)
@@ -411,7 +411,7 @@ const HomePage: React.FC = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                       onClick={() => setQuery(suggestion)}
-                      className="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-sm text-gray-700 dark:text-gray-200 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 transition-colors flex items-center gap-2"
                     >
                       <TrendingUp size={14} className="text-blue-500" />
                       {suggestion}
@@ -432,7 +432,7 @@ const HomePage: React.FC = () => {
               transition={{ duration: 0.3 }}
               className="space-y-8 w-full min-h-[500px]"
             >
-              {/* Save this Guide Button (Placeholder) */}
+              {/* Save this Guide Button */}
               <div className="flex justify-end">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -460,22 +460,22 @@ const HomePage: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800"
+                  className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-white"
                 >
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                  <div className="p-6 border-b border-gray-200 bg-gray-50">
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                         <TrendingUp className="w-5 h-5 text-green-600" />
                         Recommended Resources
                       </h2>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-sm text-gray-600">
                           {results.recommendedWebsites?.length || 0} resources found
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  <div className="divide-y divide-gray-200">
                     {results.recommendedWebsites?.length > 0 ? (
                       results.recommendedWebsites.map((website, index) => (
                         <motion.div
@@ -484,10 +484,10 @@ const HomePage: React.FC = () => {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
                           whileHover={{ scale: 1.01, backgroundColor: '#f9fafb' }}
-                          className={`p-6 transition-all duration-200 ease-in-out ${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'} hover:shadow-lg`}
+                          className={`p-6 transition-all duration-200 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:shadow-lg`}
                         >
                           <div className="flex items-start gap-4">
-                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-medium shrink-0">
+                            <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium shrink-0">
                               <Link size={18} />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -497,25 +497,25 @@ const HomePage: React.FC = () => {
                                     href={website.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-lg font-medium text-blue-600 dark:text-blue-400 hover:underline truncate block"
+                                    className="text-lg font-medium text-blue-600 hover:underline truncate block"
                                   >
                                     {website.title}
                                   </a>
                                   <div className="mt-1 flex items-center gap-2">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                       {website.category}
                                     </span>
                                     {website.relevanceScore >= 80 && (
-                                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         Highly Relevant
                                       </span>
                                     )}
                                   </div>
-                                  <p className="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed">{website.description}</p>
+                                  <p className="mt-2 text-gray-700 leading-relaxed">{website.description}</p>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
-                                  <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                                    <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
                                       <div
                                         className="h-full bg-green-500 rounded-full"
                                         style={{ width: `${website.relevanceScore}%` }}
@@ -530,7 +530,7 @@ const HomePage: React.FC = () => {
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => handleCopy(website.url)}
-                                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
+                                  className="text-sm text-gray-600 hover:text-blue-600 flex items-center gap-1 transition-colors"
                                 >
                                   <Copy size={14} />
                                   Copy URL
@@ -539,7 +539,7 @@ const HomePage: React.FC = () => {
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => window.open(website.url, '_blank')}
-                                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
+                                  className="text-sm text-gray-600 hover:text-blue-600 flex items-center gap-1 transition-colors"
                                 >
                                   <ArrowRight size={14} />
                                   Visit Site
@@ -550,7 +550,7 @@ const HomePage: React.FC = () => {
                         </motion.div>
                       ))
                     ) : (
-                      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                      <div className="p-6 text-center text-gray-500">
                         No recommended resources available
                       </div>
                     )}
@@ -564,20 +564,20 @@ const HomePage: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50 dark:bg-gray-700/50"
+                  className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-gray-50"
                 >
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700/70">
+                  <div className="p-6 border-b border-gray-200 bg-gray-100">
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                         <Zap className="w-5 h-5 text-blue-600" />
                         Practical Guides
                       </h2>
                       <div className="flex items-center gap-2">
                         <motion.button
-                           whileHover={{ scale: 1.05 }}
-                           whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => handleCopy(results.practicalGuides.join('\n\n'))}
-                          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 transition-colors"
+                          className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
                         >
                           <Copy size={16} />
                           Copy All
@@ -586,28 +586,28 @@ const HomePage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  <div className="divide-y divide-gray-200">
                     {results.practicalGuides.map((guide, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
-                         whileHover={{ scale: 1.01, backgroundColor: '#f3f4f6' }}
-                        className={`p-6 transition-all duration-200 ease-in-out ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-gray-100 dark:bg-gray-700'} hover:shadow-lg`}
+                        whileHover={{ scale: 1.01, backgroundColor: '#f3f4f6' }}
+                        className={`p-6 transition-all duration-200 ease-in-out ${index % 2 === 0 ? 'bg-gray-50' : 'bg-gray-100'} hover:shadow-lg`}
                       >
                         <div className="flex items-start gap-4">
-                           <span className="w-8 h-8 bg-blue-200 dark:bg-blue-800/30 text-blue-700 dark:text-blue-300 rounded-full flex items-center justify-center text-sm font-semibold shrink-0">
-                             {index + 1}
-                           </span>
+                          <span className="w-8 h-8 bg-blue-200 text-blue-700 rounded-full flex items-center justify-center text-sm font-semibold shrink-0">
+                            {index + 1}
+                          </span>
                           <div className="flex-1">
-                            <p className="text-gray-800 dark:text-gray-200 leading-relaxed">{guide}</p>
+                            <p className="text-gray-800 leading-relaxed">{guide}</p>
                             <div className="mt-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => handleCopy(guide)}
-                                className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
+                                className="text-sm text-gray-600 hover:text-blue-600 flex items-center gap-1 transition-colors"
                               >
                                 <Copy size={14} />
                                 Copy
@@ -627,20 +627,20 @@ const HomePage: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800"
+                  className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-white"
                 >
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                  <div className="p-6 border-b border-gray-200 bg-gray-50">
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                         <Lightbulb className="w-5 h-5 text-yellow-600" />
                         Theoretical Insight
                       </h2>
                       <div className="flex items-center gap-2">
                         <motion.button
-                           whileHover={{ scale: 1.05 }}
-                           whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => handleCopy(results.theoreticalInsight)}
-                          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 transition-colors"
+                          className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
                         >
                           <Copy size={16} />
                           Copy
@@ -648,7 +648,7 @@ const HomePage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="p-6 text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <div className="p-6 text-gray-800 leading-relaxed">
                     {results.theoreticalInsight}
                   </div>
                 </motion.section>
@@ -660,20 +660,20 @@ const HomePage: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50 dark:bg-gray-700/50"
+                  className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-gray-50"
                 >
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700/70">
+                  <div className="p-6 border-b border-gray-200 bg-gray-100">
                     <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                         <Brain className="w-5 h-5 text-purple-600" />
                         Contradictory Take
                       </h2>
                       <div className="flex items-center gap-2">
                         <motion.button
-                           whileHover={{ scale: 1.05 }}
-                           whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => handleCopy(results.contradictoryTake)}
-                          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 transition-colors"
+                          className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
                         >
                           <Copy size={16} />
                           Copy
@@ -681,7 +681,7 @@ const HomePage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="p-6 text-gray-800 dark:text-gray-200 leading-relaxed">
+                  <div className="p-6 text-gray-800 leading-relaxed">
                     {results.contradictoryTake}
                   </div>
                 </motion.section>
@@ -696,7 +696,7 @@ const HomePage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-center text-gray-600 dark:text-gray-400 text-xl mt-8 min-h-[500px]"
+                className="text-center text-gray-600 text-xl mt-8 min-h-[500px]"
               >
                 No results found for "{query}".
               </motion.div>
@@ -712,18 +712,18 @@ const HomePage: React.FC = () => {
               className="space-y-4 w-full mt-8"
             >
               <Accordion title={`Saved Guides (${savedGuides.length})`}>
-                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                <div className="divide-y divide-gray-200">
                   {savedGuides.map((guide, index) => (
                     <motion.div
                       key={`${guide.query}-${guide.timestamp}`}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex justify-between items-center"
+                      className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center"
                     >
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{guide.query}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="font-medium text-gray-900">{guide.query}</p>
+                        <p className="text-sm text-gray-500 mt-1">
                           Saved on: {new Date(guide.timestamp).toLocaleString()}
                         </p>
                       </div>
@@ -731,13 +731,13 @@ const HomePage: React.FC = () => {
                         {/* Add View and Remove buttons here */}
                         <button
                           onClick={() => setResults(guide)}
-                          className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                          className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
                         >
                           View
                         </button>
                         <button
                           onClick={() => setSavedGuides(savedGuides.filter(g => !(g.query === guide.query && g.timestamp === guide.timestamp)) )}
-                          className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          className="text-sm text-red-600 hover:text-red-700 transition-colors"
                         >
                           Remove
                         </button>
@@ -755,19 +755,19 @@ const HomePage: React.FC = () => {
          initial={{ opacity: 0, y: 50 }}
          animate={{ opacity: 1, y: 0 }}
          transition={{ duration: 0.5, delay: 1.2 }}
-         className="w-full max-w-3xl mt-8 flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm z-10"
+         className="w-full max-w-3xl mt-8 flex justify-between items-center text-gray-500 text-sm z-10"
        >
          <div>
            <button
              onClick={() => setShowKeyboardShortcuts(true)}
-             className="hover:text-white transition-colors focus:outline-none"
+             className="hover:text-gray-700 transition-colors focus:outline-none"
            >
              ⌘/ Keyboard Shortcuts
            </button>
            <span className="mx-2">|</span>
            <button
              onClick={handleToggleHistory}
-             className="hover:text-white transition-colors focus:outline-none"
+             className="hover:text-gray-700 transition-colors focus:outline-none"
            >
              ⌘L History
            </button>
@@ -792,29 +792,29 @@ const HomePage: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+              className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Search History</h2>
+              <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-lg font-semibold text-gray-900">Search History</h2>
                 <div className="flex items-center gap-2">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={clearHistory}
-                    className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    className="text-sm text-red-500 hover:text-red-600 transition-colors"
                   >
                     Clear History
                   </motion.button>
                   <button
                     onClick={() => setIsHistoryOpen(false)}
-                    className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <X size={20} />
                   </button>
                 </div>
               </div>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700 overflow-y-auto max-h-[calc(80vh-4rem)]">
+              <div className="divide-y divide-gray-200 overflow-y-auto max-h-[calc(80vh-4rem)]">
                 {searchHistory.map((item: SearchHistoryItem, index: number) => (
                   <motion.button
                     key={index}
@@ -822,17 +822,17 @@ const HomePage: React.FC = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => handleHistoryItemClick(item)}
-                    className="w-full text-left p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    className="w-full text-left p-4 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{item.query}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="font-medium text-gray-900">{item.query}</p>
+                        <p className="text-sm text-gray-500 mt-1">
                           {new Date(item.timestamp).toLocaleString()}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                        <span className="text-sm text-gray-500">
                           {item.result.practicalGuides.length} guides
                         </span>
                         <ChevronRight size={16} className="text-gray-400" />
@@ -841,7 +841,7 @@ const HomePage: React.FC = () => {
                   </motion.button>
                 ))}
                 {searchHistory.length === 0 && (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  <div className="p-8 text-center text-gray-500">
                     No search history yet
                   </div>
                 )}
@@ -865,15 +865,15 @@ const HomePage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg overflow-hidden"
+              className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Keyboard Shortcuts</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Keyboard Shortcuts</h2>
                   <button
                     onClick={() => setShowKeyboardShortcuts(false)}
-                    className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <X size={20} />
                   </button>
@@ -882,20 +882,20 @@ const HomePage: React.FC = () => {
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
-                    <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded">⌘K</kbd>
-                    <span className="text-gray-600 dark:text-gray-300">Focus search</span>
+                    <kbd className="px-2 py-1 text-xs bg-gray-100 rounded">⌘K</kbd>
+                    <span className="text-gray-600">Focus search</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded">⌘L</kbd>
-                    <span className="text-gray-600 dark:text-gray-300">Toggle history</span>
+                    <kbd className="px-2 py-1 text-xs bg-gray-100 rounded">⌘L</kbd>
+                    <span className="text-gray-600">Toggle history</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded">⌘/</kbd>
-                    <span className="text-gray-600 dark:text-gray-300">Show shortcuts</span>
+                    <kbd className="px-2 py-1 text-xs bg-gray-100 rounded">⌘/</kbd>
+                    <span className="text-gray-600">Show shortcuts</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <kbd className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded">Esc</kbd>
-                    <span className="text-gray-600 dark:text-gray-300">Clear search / Close modal</span>
+                    <kbd className="px-2 py-1 text-xs bg-gray-100 rounded">Esc</kbd>
+                    <span className="text-gray-600">Clear search / Close modal</span>
                   </div>
                 </div>
               </div>
@@ -986,12 +986,12 @@ const Accordion: React.FC<React.PropsWithChildren<{ title: string }>> = ({ title
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
       <button
-        className="flex justify-between items-center w-full p-4 text-left bg-gray-100 dark:bg-gray-700/70 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        className="flex justify-between items-center w-full p-4 text-left bg-gray-100 hover:bg-gray-200 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </button>
       <AnimatePresence>
@@ -1003,7 +1003,7 @@ const Accordion: React.FC<React.PropsWithChildren<{ title: string }>> = ({ title
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="p-4 bg-white dark:bg-gray-800">
+            <div className="p-4 bg-white">
               {children}
             </div>
           </motion.div>

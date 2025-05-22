@@ -72,13 +72,13 @@ For "${query}", provide concise JSON with:
 
 async function getWebsiteRecommendations(query: string): Promise<WebsiteRecommendation[]> {
   try {
-    if (!process.env.SERPAPI_KEY) {
+    if (!process.env.SERP_API_KEY) {
       throw new Error('SerpApi key is not configured');
     }
 
     const searchData = await getJson({
       engine: 'google',
-      api_key: process.env.SERPAPI_KEY,
+      api_key: process.env.SERP_API_KEY,
       q: query + ' career guide resources learning',
       num: 10,
     });
@@ -88,7 +88,7 @@ async function getWebsiteRecommendations(query: string): Promise<WebsiteRecommen
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
@@ -100,7 +100,7 @@ async function getWebsiteRecommendations(query: string): Promise<WebsiteRecommen
         }
       ],
       response_format: { type: "json_object" },
-      temperature: 0.3, // Lower temperature for more consistent results
+      temperature: 0.3,
     });
 
     const response = JSON.parse(completion.choices[0].message.content || '{"recommendations": []}');
@@ -151,7 +151,7 @@ export async function POST(request: Request) {
       (async () => {
         console.log('Starting insights generation...');
         const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "gpt-4",
           messages: [
             {
               role: "system",
