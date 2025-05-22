@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { Search, History, Copy, Star, TrendingUp, Sparkles, ArrowRight, Brain, Lightbulb, Zap, Command, X, ChevronDown, ChevronUp, Share2, Bookmark, Settings, HelpCircle, ChevronRight, Link } from 'lucide-react';
+import { Search, History, Copy, Star, TrendingUp, Sparkles, ArrowRight, Brain, Lightbulb, Zap, Command, X, ChevronDown, ChevronUp, Share2, Bookmark, Settings, HelpCircle, ChevronRight, Link, Check } from 'lucide-react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
 type SearchResult = {
@@ -19,6 +19,11 @@ type SearchResult = {
   }[];
   timestamp: number;
   query: string;
+  status?: {
+    phase: 'searching' | 'analyzing' | 'generating' | 'complete';
+    message: string;
+    progress: number;
+  };
 };
 
 type SearchHistoryItem = {
@@ -57,6 +62,7 @@ const HomePage: React.FC = () => {
   const searchScale = useMotionValue(1);
   const searchSpring = useSpring(searchScale, { damping: 15, stiffness: 200 });
   const [savedGuides, setSavedGuides] = useLocalStorage<SearchResult[]>('savedGuides', []);
+  const [searchStatus, setSearchStatus] = useState<SearchResult['status']>(undefined);
 
   // Debounce search query
   useEffect(() => {
@@ -139,6 +145,7 @@ const HomePage: React.FC = () => {
     }
 
     setIsLoading(true);
+    setResults(null);
     
     try {
       const response = await fetch('/api/search', {
@@ -160,7 +167,6 @@ const HomePage: React.FC = () => {
         throw new Error('Invalid response from server');
       }
 
-      // Ensure recommendedWebsites has a default empty array
       const searchResult = {
         ...data,
         recommendedWebsites: data.recommendedWebsites || [],
@@ -169,8 +175,7 @@ const HomePage: React.FC = () => {
       };
 
       setResults(searchResult);
-
-      setSearchHistory((prev: SearchHistoryItem[]) => [{
+      setSearchHistory(prev => [{
         query: query.trim(),
         timestamp: Date.now(),
         result: searchResult,
@@ -352,16 +357,36 @@ const HomePage: React.FC = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold shadow-sm hover:scale-[1.02] transition"
+              className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-2 rounded-lg font-semibold shadow-sm hover:scale-[1.02] transition flex items-center gap-2"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm">{searchStatus?.message || 'Searching...'}</span>
+                </>
               ) : (
                 'Search →'
               )}
             </motion.button>
           </form>
         </div>
+
+        {/* Simple Loading Indicator */}
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-8 text-center"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-gray-600 dark:text-gray-400">Searching...</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Search suggestions */}
         <AnimatePresence>
@@ -397,71 +422,6 @@ const HomePage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Loading state */}
-        <AnimatePresence>
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-8 w-full"
-            >
-              {/* Skeleton loading for results */}
-              <div className="space-y-6">
-                {/* Practical Guides Skeleton */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                    </div>
-                  </div>
-                  <div className="p-6 space-y-4">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex items-start gap-4">
-                        <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse shrink-0" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
-                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Theoretical Insight Skeleton */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                    </div>
-                  </div>
-                  <div className="p-6 space-y-3">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6" />
-                  </div>
-                </div>
-
-                {/* Contradictory Take Skeleton */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      <div className="h-6 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                    </div>
-                  </div>
-                  <div className="p-6 space-y-3">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full" />
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Results */}
         <AnimatePresence mode="wait">
           {results && !isLoading && (
@@ -469,6 +429,7 @@ const HomePage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
               className="space-y-8 w-full min-h-[500px]"
             >
               {/* Save this Guide Button (Placeholder) */}
@@ -812,7 +773,7 @@ const HomePage: React.FC = () => {
            </button>
          </div>
          <div>
-           Made with ❤️ by Gyan and Ameya
+           Made with ❤️ by Gyan
          </div>
        </motion.footer>
       </motion.div>{/* Closing tag for Main Content Area */}

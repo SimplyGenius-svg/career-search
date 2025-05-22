@@ -29,6 +29,11 @@ type SearchResponse = {
   theoreticalInsight: string;
   contradictoryTake: string;
   recommendedWebsites: WebsiteRecommendation[];
+  status: {
+    phase: 'searching' | 'analyzing' | 'generating' | 'complete';
+    message: string;
+    progress: number;
+  };
 };
 
 // Type for SerpApi organic search results
@@ -83,7 +88,7 @@ async function getWebsiteRecommendations(query: string): Promise<WebsiteRecommen
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -134,25 +139,35 @@ export async function POST(request: Request) {
 
     // Run API calls in parallel
     const [recommendedWebsites, insightsCompletion] = await Promise.all([
-      getWebsiteRecommendations(query).catch(error => {
-        console.error('Failed to get website recommendations:', error);
-        return [];
-      }),
-      openai.chat.completions.create({
-        model: "gpt-4-turbo-preview",
-        messages: [
-          {
-            role: "system",
-            content: "You are a career development expert. Be concise and practical."
-          },
-          {
-            role: "user",
-            content: getInsightsPrompt(query)
-          }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.3,
-      })
+      (async () => {
+        console.log('Starting website recommendations...');
+        const websites = await getWebsiteRecommendations(query).catch(error => {
+          console.error('Failed to get website recommendations:', error);
+          return [];
+        });
+        console.log('Finished website recommendations');
+        return websites;
+      })(),
+      (async () => {
+        console.log('Starting insights generation...');
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: "You are a career development expert. Be concise and practical."
+            },
+            {
+              role: "user",
+              content: getInsightsPrompt(query)
+            }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        });
+        console.log('Finished insights generation');
+        return completion;
+      })()
     ]);
 
     const insights = JSON.parse(insightsCompletion.choices[0].message.content || '{}');
@@ -160,6 +175,11 @@ export async function POST(request: Request) {
     const response: SearchResponse = {
       ...insights,
       recommendedWebsites,
+      status: {
+        phase: 'complete',
+        message: 'Search completed successfully',
+        progress: 100
+      }
     };
 
     // Cache the result
