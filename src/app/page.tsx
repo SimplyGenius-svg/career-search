@@ -543,7 +543,7 @@ const HomePage: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              GitHired
+              GetHired
             </motion.h1>
             <motion.p
               className="text-lg md:text-xl text-gray-600 font-medium"
@@ -1007,7 +1007,7 @@ const HomePage: React.FC = () => {
           
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-600">
-              Powered by AI • Made with <Heart className="w-4 h-4 text-red-500 inline fill-current" /> by Gyan
+              Powered by AI • Made with <Heart className="w-4 h-4 text-red-500 inline fill-current" /> by gyanb
             </div>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Service Online" />
           </div>
