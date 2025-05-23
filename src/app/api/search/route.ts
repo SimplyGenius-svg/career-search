@@ -24,17 +24,15 @@ type WebsiteRecommendation = {
   lastUpdated?: string;
   features?: string[];
   isPremium?: boolean;
+  isClickable: boolean;
+  accessType?: 'free' | 'premium' | 'registration' | 'unknown';
 };
 
 type SearchResponse = {
   practicalGuides: string[];
   theoreticalInsight: string;
   contradictoryTake: string;
-  jobListings: JobListing[];
-  careerPaths: CareerPath[];
-  skillAssessments: SkillAssessment[];
   marketInsights: MarketInsights;
-  networkingOpportunities: NetworkingOpportunity[];
   recommendedWebsites: WebsiteRecommendation[];
   relatedSearches: string[];
   searchMetadata: {
@@ -48,61 +46,6 @@ type SearchResponse = {
     message: string;
     progress: number;
   };
-};
-
-type JobListing = {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salary?: string;
-  type: 'full-time' | 'part-time' | 'contract' | 'remote' | 'hybrid';
-  level: 'entry' | 'mid' | 'senior' | 'executive';
-  tags: string[];
-  description: string;
-  url: string;
-  postedDate: string;
-  relevanceScore: number;
-  matchingSkills: string[];
-  benefits?: string[];
-  companySize?: string;
-  industry?: string;
-  requirements?: string[];
-  remote?: boolean;
-  sponsored?: boolean;
-};
-
-type CareerPath = {
-  title: string;
-  description: string;
-  requiredSkills: string[];
-  averageSalary: string;
-  salaryRange: {
-    min: number;
-    max: number;
-  };
-  growthRate: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  timeToMaster: string;
-  relatedRoles: string[];
-  educationRequirements: string[];
-  certifications: string[];
-};
-
-type SkillAssessment = {
-  skill: string;
-  currentLevel: number;
-  targetLevel: number;
-  marketDemand: 'high' | 'medium' | 'low';
-  resources: {
-    title: string;
-    type: 'course' | 'book' | 'practice' | 'certification';
-    url?: string;
-    duration?: string;
-    cost?: string;
-  }[];
-  timeToImprove: string;
-  relatedSkills: string[];
 };
 
 type MarketInsights = {
@@ -132,23 +75,8 @@ type MarketInsights = {
   }[];
 };
 
-type NetworkingOpportunity = {
-  title: string;
-  type: 'event' | 'community' | 'meetup' | 'conference' | 'webinar';
-  date?: string;
-  location: string;
-  url: string;
-  relevance: number;
-  attendees?: number;
-  cost?: string;
-  description: string;
-  organizer?: string;
-  tags: string[];
-};
-
 // Add type for SerpAPI response
 type SerpAPIResponse = {
-  jobListings: JobListing[];
   websiteRecommendations: WebsiteRecommendation[];
   searchMetadata: {
     totalResults: number;
@@ -166,19 +94,6 @@ type SerpAPIOrganicResult = {
   snippet: string;
 };
 
-type SerpAPIJobResult = {
-  job_id?: string;
-  title: string;
-  company_name: string;
-  location: string;
-  salary?: string;
-  job_type?: string;
-  description?: string;
-  link: string;
-  posted_at?: string;
-  related_links?: Array<{ text: string }>;
-};
-
 type SerpAPISearchInformation = {
   total_results?: number;
   time_taken_displayed?: number;
@@ -187,7 +102,6 @@ type SerpAPISearchInformation = {
 
 type SerpAPIRawResponse = {
   organic_results?: SerpAPIOrganicResult[];
-  jobs_results?: SerpAPIJobResult[];
   search_information?: SerpAPISearchInformation;
 };
 
@@ -294,65 +208,21 @@ async function generateInsights(query: string, userProfile: any): Promise<{
 // New function to get real search results from SerpAPI
 async function getSerpResults(query: string, filters: any = {}): Promise<SerpAPIResponse> {
   try {
-    // Determine if the query is likely a job search
-    const isJobSearch = query.toLowerCase().includes('job') || 
-                        query.toLowerCase().includes('career') ||
-                        query.toLowerCase().includes('hiring') ||
-                        query.toLowerCase().includes('position');
+    // Get organic results for articles and resources
+    const organicResponse = await axios.get<SerpAPIRawResponse>(SERP_API_URL, {
+      params: {
+        api_key: SERP_API_KEY,
+        q: query,
+        engine: 'google',
+        google_domain: 'google.com',
+        gl: 'us',
+        hl: 'en',
+        num: 10,
+        ...filters
+      }
+    });
 
-    // Always use both engines to get comprehensive results
-    const [jobsResponse, organicResponse] = await Promise.all([
-      // Get job results
-      isJobSearch ? axios.get<SerpAPIRawResponse>(SERP_API_URL, {
-        params: {
-          api_key: SERP_API_KEY,
-          q: query,
-          engine: 'google_jobs',
-          google_domain: 'google.com',
-          gl: 'us',
-          hl: 'en',
-          num: 10
-        }
-      }) : Promise.resolve({ data: { jobs_results: [] } }),
-
-      // Get organic results for articles and resources
-      axios.get<SerpAPIRawResponse>(SERP_API_URL, {
-        params: {
-          api_key: SERP_API_KEY,
-          q: query,
-          engine: 'google',
-          google_domain: 'google.com',
-          gl: 'us',
-          hl: 'en',
-          num: 10,
-          ...filters
-        }
-      })
-    ]);
-
-    const jobListings: JobListing[] = [];
     const websiteRecommendations: WebsiteRecommendation[] = [];
-
-    // Process job results
-    if (jobsResponse.data.jobs_results) {
-      jobsResponse.data.jobs_results.forEach((job: any) => {
-        jobListings.push({
-          id: job.job_id || Math.random().toString(),
-          title: job.title || '',
-          company: job.company_name || '',
-          location: job.location || '',
-          salary: job.salary || '',
-          type: job.detected_extensions?.job_type?.toLowerCase() || 'full-time',
-          level: job.detected_extensions?.schedule_type?.toLowerCase() || 'mid',
-          tags: [],
-          description: job.description || job.snippet || '',
-          url: job.link || job.url || '',
-          postedDate: job.posted_at || new Date().toISOString().split('T')[0],
-          relevanceScore: 70,
-          matchingSkills: []
-        });
-      });
-    }
 
     // Process organic results for articles and resources
     if (organicResponse.data.organic_results) {
@@ -393,6 +263,26 @@ async function getSerpResults(query: string, filters: any = {}): Promise<SerpAPI
           trustScore = 80;
         }
 
+        // Determine if the resource is clickable and its access type
+        let isClickable = true;
+        let accessType: 'free' | 'premium' | 'registration' | 'unknown' = 'unknown';
+
+        if (result.link?.includes('medium.com')) {
+          accessType = 'premium';
+          isClickable = true; // Medium articles are clickable but may require subscription
+        } else if (result.link?.includes('coursera.org') || result.link?.includes('udemy.com')) {
+          accessType = 'premium';
+          isClickable = true;
+        } else if (result.link?.includes('github.com') || 
+                  result.link?.includes('stackoverflow.com') ||
+                  result.link?.includes('wikipedia.org')) {
+          accessType = 'free';
+          isClickable = true;
+        } else if (result.link?.includes('dev.to')) {
+          accessType = 'registration';
+          isClickable = true;
+        }
+
         // Extract features from the snippet
         const features: string[] = [];
         if (result.snippet?.toLowerCase().includes('guide')) features.push('Guide');
@@ -412,7 +302,9 @@ async function getSerpResults(query: string, filters: any = {}): Promise<SerpAPI
           isPremium: result.link?.includes('medium.com') || 
                      result.link?.includes('udemy.com') ||
                      result.link?.includes('coursera.org'),
-          lastUpdated: new Date().toISOString().split('T')[0] // We don't have actual last updated date
+          lastUpdated: new Date().toISOString().split('T')[0],
+          isClickable,
+          accessType
         });
       });
     }
@@ -421,8 +313,7 @@ async function getSerpResults(query: string, filters: any = {}): Promise<SerpAPI
     websiteRecommendations.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
     return {
-      jobListings,
-      websiteRecommendations: websiteRecommendations.slice(0, 6), // Limit to top 6 recommendations
+      websiteRecommendations: websiteRecommendations.slice(0, 10), // Increased to 10 recommendations
       searchMetadata: {
         totalResults: organicResponse.data.search_information?.total_results || 0,
         searchTime: organicResponse.data.search_information?.time_taken_displayed || 0,
@@ -517,16 +408,12 @@ export async function POST(request: Request) {
       practicalGuides: insights.practicalGuides,
       theoreticalInsight: insights.theoreticalInsight,
       contradictoryTake: insights.contradictoryTake,
-      jobListings: serpResults.jobListings,
-      careerPaths: [], // Not re-introducing for now
-      skillAssessments: [], // Not re-introducing for now
       marketInsights: marketInsights,
-      networkingOpportunities: [], // Not re-introducing for now
       recommendedWebsites: serpResults.websiteRecommendations,
       relatedSearches: insights.relatedSearches,
       searchMetadata: serpResults.searchMetadata,
-      status: { // Update status to reflect partial AI enrichment
-        phase: 'complete', // Changed from partial to complete, message explains AI skip
+      status: {
+        phase: 'complete',
         message: process.env.OPENAI_API_KEY ? 'Search and analysis complete' : 'Search complete (AI skipped)',
         progress: 100
       }
