@@ -187,6 +187,10 @@ const HomePage: React.FC = () => {
     progress: 0
   });
 
+  // Refs for timeouts
+  const analyzingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const generatingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Remove the clearing of search history on mount
   // This was only for development/debugging
 
@@ -277,6 +281,10 @@ const HomePage: React.FC = () => {
       return;
     }
 
+    // Clear any previous timeouts
+    if (analyzingTimeoutRef.current) clearTimeout(analyzingTimeoutRef.current);
+    if (generatingTimeoutRef.current) clearTimeout(generatingTimeoutRef.current);
+
     setIsLoading(true);
     setResults(null);
     setSearchStatus({
@@ -287,8 +295,9 @@ const HomePage: React.FC = () => {
 
     try {
       // Update search status during the process
-      setTimeout(() => {
-        if (isLoading) {
+      analyzingTimeoutRef.current = setTimeout(() => {
+        // Only update if still loading (i.e., this search is still active)
+        if (isLoading) { // Note: isLoading might not be updated yet here, consider using a ref if needed for perfect accuracy
           setSearchStatus({
             phase: 'analyzing',
             message: 'Analyzing results...',
@@ -297,8 +306,9 @@ const HomePage: React.FC = () => {
         }
       }, 1000);
 
-      setTimeout(() => {
-        if (isLoading) {
+      generatingTimeoutRef.current = setTimeout(() => {
+        // Only update if still loading
+        if (isLoading) { // Note: isLoading might not be updated yet here
           setSearchStatus({
             phase: 'generating',
             message: 'Generating insights...',
@@ -311,7 +321,9 @@ const HomePage: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
+        credentials: 'same-origin',
         body: JSON.stringify({
           query: query.trim(),
           filters: {
@@ -330,8 +342,24 @@ const HomePage: React.FC = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Search failed');
+        const errorData = await response.json().catch(() => null);
+        console.error('API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+
+        if (response.status === 403) {
+          throw new Error('Access denied. Please check your permissions.');
+        } else if (response.status === 404) {
+          throw new Error('Search service not found. Please try again later.');
+        } else if (response.status === 500) {
+          throw new Error('Server error. Please try again later.');
+        } else if (response.status === 0) {
+          throw new Error('Network error. Please check your connection.');
+        } else {
+          throw new Error(errorData?.error || `Search failed (${response.status})`);
+        }
       }
 
       const { success, data, warnings } = await response.json();
@@ -339,7 +367,7 @@ const HomePage: React.FC = () => {
       console.log('API Response:', { success, data, warnings }); // Debug log
 
       if (!success) {
-        throw new Error('Search failed');
+        throw new Error(data?.error || 'Search failed');
       }
 
       if (warnings) {
@@ -373,12 +401,24 @@ const HomePage: React.FC = () => {
 
     } catch (error) {
       console.error('Search failed:', error);
-      toast.error(error instanceof Error ? error.message : 'Search failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+      const errorMessage = error instanceof Error ? error.message : 'Search failed. Please try again.';
+      toast.error(errorMessage);
+      
+      // Update search status to show error
       setSearchStatus({
         phase: 'complete',
-        message: '',
+        message: errorMessage,
+        progress: 100
+      });
+    } finally {
+      setIsLoading(false);
+      // Clear timeouts on completion or error
+      if (analyzingTimeoutRef.current) clearTimeout(analyzingTimeoutRef.current);
+      if (generatingTimeoutRef.current) clearTimeout(generatingTimeoutRef.current);
+      setSearchStatus({
+        phase: 'complete',
+        // Keep the last message (success or error)
+        message: searchStatus.message, // This might not be the absolute final message if error occurs
         progress: 100
       });
     }

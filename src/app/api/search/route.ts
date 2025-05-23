@@ -331,6 +331,18 @@ async function getSerpResults(query: string, filters: any = {}): Promise<SerpAPI
 export async function POST(request: Request) {
   const startTime = Date.now();
   
+  // Add CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*', // In production, replace with your actual domain
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  // Handle OPTIONS request for CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, { headers });
+  }
+  
   try {
     const body = await request.json();
     const { query, filters = {}, userProfile = {} } = body;
@@ -423,7 +435,7 @@ export async function POST(request: Request) {
       success: true,
       data: response,
       warnings: !process.env.OPENAI_API_KEY ? "OpenAI API key not configured. AI insights are skipped." : undefined
-    });
+    }, { headers }); // Add headers to the response
 
   } catch (error) {
     console.error('Search error:', error);
@@ -434,16 +446,27 @@ export async function POST(request: Request) {
         error: error instanceof Error ? error.message : 'An error occurred during the search',
         searchTime: Date.now() - startTime
       },
-      { status: 500 }
+      { status: 500, headers } // Add headers to error response
     );
   }
 }
 
 // Health check endpoint
-export async function GET() {
+export async function GET(request: Request) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*', // In production, replace with your actual domain
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  // Handle OPTIONS request for CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, { headers });
+  }
+
   return NextResponse.json({
     status: 'healthy',
     version: '2.0.0',
     timestamp: new Date().toISOString()
-  });
+  }, { headers }); // Add headers to the response
 }
