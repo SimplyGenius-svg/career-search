@@ -191,9 +191,6 @@ const HomePage: React.FC = () => {
   const analyzingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const generatingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Remove the clearing of search history on mount
-  // This was only for development/debugging
-
   // Enhanced debounce effect
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -294,10 +291,8 @@ const HomePage: React.FC = () => {
     });
 
     try {
-      // Update search status during the process
       analyzingTimeoutRef.current = setTimeout(() => {
-        // Only update if still loading (i.e., this search is still active)
-        if (isLoading) { // Note: isLoading might not be updated yet here, consider using a ref if needed for perfect accuracy
+        if (isLoading) {
           setSearchStatus({
             phase: 'analyzing',
             message: 'Analyzing results...',
@@ -307,8 +302,7 @@ const HomePage: React.FC = () => {
       }, 1000);
 
       generatingTimeoutRef.current = setTimeout(() => {
-        // Only update if still loading
-        if (isLoading) { // Note: isLoading might not be updated yet here
+        if (isLoading) {
           setSearchStatus({
             phase: 'generating',
             message: 'Generating insights...',
@@ -349,26 +343,10 @@ const HomePage: React.FC = () => {
           error: errorData
         });
 
-        if (response.status === 403) {
-          throw new Error('Access denied. Please check your permissions.');
-        } else if (response.status === 404) {
-          throw new Error('Search service not found. Please try again later.');
-        } else if (response.status === 500) {
-          throw new Error('Server error. Please try again later.');
-        } else if (response.status === 0) {
-          throw new Error('Network error. Please check your connection.');
-        } else {
-          throw new Error(errorData?.error || `Search failed (${response.status})`);
-        }
+        throw new Error(errorData?.error || `Search failed (${response.status})`);
       }
 
       const { success, data, warnings } = await response.json();
-
-      console.log('API Response:', { success, data, warnings }); // Debug log
-
-      if (!success) {
-        throw new Error(data?.error || 'Search failed');
-      }
 
       if (warnings) {
         toast.custom((t) => (
@@ -384,12 +362,8 @@ const HomePage: React.FC = () => {
         timestamp: Date.now()
       };
 
-      console.log('Search Result:', searchResult); // Debug log
-      console.log('Recommended Websites:', searchResult.recommendedWebsites); // Debug log
-
       setResults(searchResult);
       
-      // Save to history
       setSearchHistory(prev => [{
         query: query.trim(),
         timestamp: Date.now(),
@@ -404,7 +378,6 @@ const HomePage: React.FC = () => {
       const errorMessage = error instanceof Error ? error.message : 'Search failed. Please try again.';
       toast.error(errorMessage);
       
-      // Update search status to show error
       setSearchStatus({
         phase: 'complete',
         message: errorMessage,
@@ -412,13 +385,11 @@ const HomePage: React.FC = () => {
       });
     } finally {
       setIsLoading(false);
-      // Clear timeouts on completion or error
       if (analyzingTimeoutRef.current) clearTimeout(analyzingTimeoutRef.current);
       if (generatingTimeoutRef.current) clearTimeout(generatingTimeoutRef.current);
       setSearchStatus({
         phase: 'complete',
-        // Keep the last message (success or error)
-        message: searchStatus.message, // This might not be the absolute final message if error occurs
+        message: searchStatus.message,
         progress: 100
       });
     }
@@ -591,7 +562,7 @@ const HomePage: React.FC = () => {
           className="relative"
         >
           <form onSubmit={handleSearch} className="relative">
-            <div className="flex items-center gap-3 px-6 py-4 rounded-2xl shadow-xl border border-white/50 bg-white/80 backdrop-blur-sm focus-within:ring-2 ring-blue-500/30 transition-all duration-300">
+            <div className="flex items-center gap-3 px-6 py-4 rounded-2xl shadow-xl border border-white/50 bg-white/80 backdrop-blur-sm focus-within:ring-2 ring-blue-500/30 transition-all duration-300 hover:shadow-2xl hover:border-white/70">
               <Search className="h-6 w-6 text-gray-500" />
               <input
                 ref={searchInputRef}
@@ -621,19 +592,22 @@ const HomePage: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+                className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 disabled:opacity-50 relative overflow-hidden group"
               >
-                {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>{searchStatus?.message || 'Searching...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Search</span>
-                    <Rocket className="w-5 h-5" />
-                  </>
-                )}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative flex items-center gap-2">
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>{searchStatus?.message || 'Searching...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Search</span>
+                      <Rocket className="w-5 h-5 group-hover:animate-bounce" />
+                    </>
+                  )}
+                </div>
               </motion.button>
             </div>
           </form>
@@ -681,14 +655,29 @@ const HomePage: React.FC = () => {
             {/* Results Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Search Results for "{results.query}"</h2>
-                <p className="text-gray-600 mt-1">
+                <motion.h2 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-2xl font-bold text-gray-900 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                >
+                  Search Results for "{results.query}"
+                </motion.h2>
+                <motion.p 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-gray-600 mt-1"
+                >
                   {results.searchMetadata?.totalResults 
                     ? `Found ${results.searchMetadata.totalResults.toLocaleString()} results` 
                     : 'Found comprehensive career insights and opportunities'}
-                </p>
+                </motion.p>
               </div>
-              <div className="flex items-center gap-3">
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-3"
+              >
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -711,7 +700,7 @@ const HomePage: React.FC = () => {
                   <Share2 className="w-4 h-4" />
                   Share
                 </motion.button>
-              </div>
+              </motion.div>
             </div>
 
             {/* Recommended Resources & Articles */}
